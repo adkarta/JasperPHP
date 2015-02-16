@@ -3,12 +3,24 @@ namespace JasperPHP;
 
 class JasperPHP
 {
+
+    private static $_instance = null;
+
     protected static $executable = "/../JasperStarter/bin/jasperstarter";
     protected static $the_command;
     protected static $redirect_output;
     protected static $background;
     protected static $windows = false;
     protected static $formats = array('pdf', 'rtf', 'xls', 'xlsx', 'docx', 'odt', 'ods', 'pptx', 'csv', 'html', 'xhtml', 'xml', 'jrprint');
+
+    public static function getInstance ()
+    {
+        if (self::$_instance === null) {
+            self::$_instance = new self;
+        }
+
+        return self::$_instance;
+    }
 
     function __construct()
     {
