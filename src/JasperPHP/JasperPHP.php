@@ -3,17 +3,17 @@ namespace JasperPHP;
 
 class JasperPHP
 {
-    protected $executable = "/../JasperStarter/bin/jasperstarter";
-    protected $the_command;
-    protected $redirect_output;
-    protected $background;
-    protected $windows = false;
-    protected $formats = array('pdf', 'rtf', 'xls', 'xlsx', 'docx', 'odt', 'ods', 'pptx', 'csv', 'html', 'xhtml', 'xml', 'jrprint');
+    protected static $executable = "/../JasperStarter/bin/jasperstarter";
+    protected static $the_command;
+    protected static $redirect_output;
+    protected static $background;
+    protected static $windows = false;
+    protected static $formats = array('pdf', 'rtf', 'xls', 'xlsx', 'docx', 'odt', 'ods', 'pptx', 'csv', 'html', 'xhtml', 'xml', 'jrprint');
 
     function __construct()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-           $this->windows = true;
+           self::$windows = true;
     }
 
     public static function __callStatic($method, $parameters)
@@ -30,7 +30,7 @@ class JasperPHP
         if(is_null($input_file) || empty($input_file))
             throw new \Exception("No input file", 1);
 
-        $command = __DIR__ . $this->executable;
+        $command = __DIR__ . self::$executable;
         
         $command .= " cp ";
 
@@ -39,9 +39,9 @@ class JasperPHP
         if( $output_file !== false )
             $command .= " -o " . $output_file;
 
-        $this->redirect_output  = $redirect_output;
-        $this->background       = $background;
-        $this->the_command      = $command;
+        self::$redirect_output  = $redirect_output;
+        self::$background       = $background;
+        self::$the_command      = $command;
 
         return $this;
     }
@@ -55,15 +55,15 @@ class JasperPHP
         {
             foreach ($format as $key) 
             {
-                if( !in_array($key, $this->formats))
+                if( !in_array($key, self::$formats))
                     throw new \Exception("Invalid format!", 1);
             }
         } else {
-            if( !in_array($format, $this->formats))
+            if( !in_array($format, self::$formats))
                     throw new \Exception("Invalid format!", 1);
         }        
     
-        $command = __DIR__ . $this->executable;
+        $command = __DIR__ . self::$executable;
         
         $command .= " pr ";
 
@@ -101,33 +101,33 @@ class JasperPHP
             $command .= " -n " . $db_connection['database'];
         }
 
-        $this->redirect_output  = $redirect_output;
-        $this->background       = $background;
-        $this->the_command      = $command;
+        self::$redirect_output  = $redirect_output;
+        self::$background       = $background;
+        self::$the_command      = $command;
 
         return $this;
     }
 
     public function output()
     {
-        return $this->the_command;
+        return self::$the_command;
     }
 
     public function execute($run_as_user = false)
     {
-        if( $this->redirect_output && !$this->windows)
-            $this->the_command .= " > /dev/null 2>&1";
+        if( self::$redirect_output && !self::$windows)
+            self::$the_command .= " > /dev/null 2>&1";
     
-        if( $this->background && !$this->windows )
-            $this->the_command .= " &";
+        if( self::$background && !self::$windows )
+            self::$the_command .= " &";
 
-        if( $run_as_user !== false && strlen($run_as_user > 0) && !$this->windows )
-            $this->the_command = "su -u " . $run_as_user . " -c \"" . $this->the_command . "\"";
+        if( $run_as_user !== false && strlen($run_as_user > 0) && !self::$windows )
+            self::$the_command = "su -u " . $run_as_user . " -c \"" . self::$the_command . "\"";
 
         $output     = array();
         $return_var = 0;
 
-        exec($this->the_command, $output, $return_var);
+        exec(self::$the_command, $output, $return_var);
 
         if($return_var != 0) 
             throw new \Exception("There was and error executing the report! Time to check the logs!", 1);
